@@ -41,7 +41,7 @@ color:var(--primary);
 
 .right{
 display:flex;
-gap:15px;
+gap:10px;
 align-items:center;
 }
 
@@ -51,6 +51,7 @@ color:white;
 padding:6px 12px;
 border-radius:6px;
 font-weight:bold;
+cursor:pointer;
 }
 
 .login-btn{
@@ -62,7 +63,7 @@ border-radius:6px;
 cursor:pointer;
 }
 
-/* LOGIN POPUP */
+/* POPUP */
 
 .popup{
 display:none;
@@ -82,6 +83,8 @@ padding:20px;
 border-radius:10px;
 width:300px;
 text-align:center;
+max-height:400px;
+overflow:auto;
 }
 
 .popup-box input{
@@ -130,11 +133,6 @@ background:white;
 border-radius:10px;
 overflow:hidden;
 box-shadow:0 5px 10px rgba(0,0,0,0.1);
-transition:0.3s;
-}
-
-.product:hover{
-transform:translateY(-5px);
 }
 
 .product img{
@@ -180,9 +178,15 @@ margin-top:30px;
 
 <div class="right">
 
-<button class="login-btn" onclick="openLogin()">Login</button>
+<button class="login-btn" onclick="openLogin()" id="loginBtn">
+Login
+</button>
 
-<div class="cart">
+<button class="login-btn" onclick="logout()" id="logoutBtn" style="display:none;background:red;">
+Logout
+</button>
+
+<div class="cart" onclick="openCart()">
 Cart : <span id="cart-count">0</span>
 </div>
 
@@ -191,22 +195,49 @@ Cart : <span id="cart-count">0</span>
 </nav>
 
 
-<!-- LOGIN POPUP -->
+<!-- LOGIN -->
 
 <div class="popup" id="loginBox">
 
 <div class="popup-box">
 
-<h3>Login</h3>
+<h3 id="formTitle">Login</h3>
 
-<input type="text" placeholder="Username"><br>
-<input type="password" placeholder="Password"><br>
+<input type="text" id="username" placeholder="Username"><br>
+<input type="password" id="password" placeholder="Password"><br>
 
-<button>Submit</button>
+<button onclick="login()">Submit</button>
 
-<br>
+<p id="switchText">
+Don't have account?
+<span onclick="showSignup()" style="color:blue;cursor:pointer">
+Create Account
+</span>
+</p>
 
 <button class="close" onclick="closeLogin()">Close</button>
+
+</div>
+
+</div>
+
+
+
+<!-- CART POPUP -->
+
+<div class="popup" id="cartBox">
+
+<div class="popup-box">
+
+<h3>Your Cart</h3>
+
+<ul id="cartItems"></ul>
+
+<button onclick="clearCart()">Clear Cart</button>
+
+<br><br>
+
+<button class="close" onclick="closeCart()">Close</button>
 
 </div>
 
@@ -235,7 +266,7 @@ Cart : <span id="cart-count">0</span>
 <div class="info">
 <h3>Headphone</h3>
 <p class="price">₹1299</p>
-<button onclick="addToCart()">Add to Cart</button>
+<button onclick="addToCart('Headphone')">Add to Cart</button>
 </div>
 </div>
 
@@ -245,27 +276,27 @@ Cart : <span id="cart-count">0</span>
 <div class="info">
 <h3>Smartphone</h3>
 <p class="price">₹39999</p>
-<button onclick="addToCart()">Add to Cart</button>
+<button onclick="addToCart('Smartphone')">Add to Cart</button>
 </div>
 </div>
 
 
 <div class="product">
-<img src="https://tse4.mm.bing.net/th/id/OIP.SZwgX2tpRJuo5MnMQ6rr8wHaDv?pid=Api&P=0&h=180">
+<img src="https://tse4.mm.bing.net/th/id/OIP.SZwgX2tpRJuo5MnMQ6rr8wHaDv?pid=Api">
 <div class="info">
 <h3>Keyboard</h3>
 <p class="price">₹12000</p>
-<button onclick="addToCart()">Add to Cart</button>
+<button onclick="addToCart('Keyboard')">Add to Cart</button>
 </div>
 </div>
 
 
 <div class="product">
-<img src="https://tse3.mm.bing.net/th/id/OIP.7bsTJYW9vlGrfrWW37VhEwHaE6?pid=Api&P=0&h=180">
+<img src="https://tse3.mm.bing.net/th/id/OIP.7bsTJYW9vlGrfrWW37VhEwHaE6?pid=Api">
 <div class="info">
 <h3>Laptop</h3>
 <p class="price">₹49999</p>
-<button onclick="addToCart()">Add to Cart</button>
+<button onclick="addToCart('Laptop')">Add to Cart</button>
 </div>
 </div>
 
@@ -283,12 +314,58 @@ Cart : <span id="cart-count">0</span>
 
 <script>
 
-let cart = 0;
+let cart = [];
+let mode="login";
 
-function addToCart(){
-cart++;
-document.getElementById("cart-count").innerText = cart;
+
+function addToCart(item){
+
+cart.push(item);
+
+document.getElementById("cart-count").innerText=cart.length;
+
 }
+
+
+function openCart(){
+
+let list=document.getElementById("cartItems");
+
+list.innerHTML="";
+
+cart.forEach(function(i){
+
+let li=document.createElement("li");
+
+li.innerText=i;
+
+list.appendChild(li);
+
+});
+
+document.getElementById("cartBox").style.display="flex";
+
+}
+
+
+function closeCart(){
+
+document.getElementById("cartBox").style.display="none";
+
+}
+
+
+function clearCart(){
+
+cart=[];
+
+document.getElementById("cart-count").innerText=0;
+
+document.getElementById("cartItems").innerHTML="";
+
+}
+
+
 
 function openLogin(){
 document.getElementById("loginBox").style.display="flex";
@@ -297,6 +374,76 @@ document.getElementById("loginBox").style.display="flex";
 function closeLogin(){
 document.getElementById("loginBox").style.display="none";
 }
+
+
+function showSignup(){
+
+mode="signup";
+
+document.getElementById("formTitle").innerText="Create Account";
+
+document.getElementById("switchText").innerHTML=
+'Already have account? <span onclick="showLogin()">Login</span>';
+
+}
+
+
+function showLogin(){
+
+mode="login";
+
+document.getElementById("formTitle").innerText="Login";
+
+document.getElementById("switchText").innerHTML=
+'Don\'t have account? <span onclick="showSignup()">Create</span>';
+
+}
+
+
+function login(){
+
+let user=username.value;
+let pass=password.value;
+
+if(mode=="signup"){
+
+localStorage.setItem("user",user);
+localStorage.setItem("pass",pass);
+
+alert("Account created");
+
+showLogin();
+
+return;
+
+}
+
+if(user==localStorage.getItem("user")
+&& pass==localStorage.getItem("pass")){
+
+alert("Login success");
+
+loginBtn.style.display="none";
+logoutBtn.style.display="inline";
+
+closeLogin();
+
+}else{
+
+alert("Wrong login");
+
+}
+
+}
+
+
+function logout(){
+
+loginBtn.style.display="inline";
+logoutBtn.style.display="none";
+
+}
+
 
 </script>
 
