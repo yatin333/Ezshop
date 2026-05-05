@@ -1,451 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ezshop | Shopping Made Easy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #10b981;
+            --accent: #f43f5e;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
 
-<title>ezshop</title>
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-<style>
+        /* NAVIGATION */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 24px; font-weight: 800; cursor: pointer; }
+        .logo span { color: var(--primary); }
+        .subtitle { font-size: 11px; color: #64748b; font-weight: 500; display: block; margin-top: -4px; }
+        .nav-actions { display: flex; gap: 20px; align-items: center; }
 
-:root{
---primary:#6366f1;
---light:#f1f5f9;
-}
+        /* GATEWAY */
+        #gateway { position: fixed; inset: 0; background: var(--primary); z-index: 5000; display: flex; align-items: center; justify-content: center; color: white; }
+        .gate-box { background: white; padding: 40px; border-radius: 20px; color: var(--text); text-align: center; width: 350px; }
+        .gate-btn { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
 
-body{
-margin:0;
-font-family:Segoe UI;
-background:var(--light);
-}
+        /* CATEGORIES */
+        .categories { display: flex; justify-content: center; gap: 10px; padding: 15px; background: white; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .cat-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; white-space: nowrap; }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .cat-btn.sale { border-color: var(--accent); color: var(--accent); font-weight: bold; }
 
-/* NAVBAR */
+        /* GRID */
+        .shop { padding: 30px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .product-card { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; transition: 0.3s; position: relative; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .product-card img { width: 100%; height: 180px; object-fit: cover; }
+        .sale-badge { position: absolute; top: 10px; left: 10px; background: var(--accent); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 
-nav{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px 40px;
-background:white;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
-}
+        /* MODALS */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 25px; border-radius: 15px; width: 450px; max-height: 85vh; overflow-y: auto; }
+        .order-item { display: flex; gap: 15px; margin: 10px 0; padding: 10px; border: 1px solid #eee; border-radius: 8px; align-items: center; }
+        .order-item img { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; }
 
-.logo{
-font-size:26px;
-font-weight:bold;
-}
+        /* STATUS COLORS */
+        .status-pill { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .st-pending { background: #fef3c7; color: #92400e; }
+        .st-packaged { background: #dbeafe; color: #1e40af; }
+        .st-out { background: #fae8ff; color: #86198f; }
+        .st-delivered { background: #dcfce7; color: #166534; }
 
-.logo span{
-color:var(--primary);
-}
-
-.right{
-display:flex;
-gap:10px;
-align-items:center;
-}
-
-.cart{
-background:var(--primary);
-color:white;
-padding:6px 12px;
-border-radius:6px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.login-btn{
-background:#10b981;
-color:white;
-padding:6px 12px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-/* POPUP */
-
-.popup{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.4);
-justify-content:center;
-align-items:center;
-}
-
-.popup-box{
-background:white;
-padding:20px;
-border-radius:10px;
-width:300px;
-text-align:center;
-max-height:400px;
-overflow:auto;
-}
-
-.popup-box input{
-width:90%;
-padding:8px;
-margin:5px;
-}
-
-.close{
-background:red;
-color:white;
-border:none;
-padding:5px 10px;
-cursor:pointer;
-margin-top:10px;
-}
-
-/* HERO */
-
-.hero{
-text-align:center;
-padding:50px;
-background:linear-gradient(135deg,#eef2ff,#ffffff);
-}
-
-/* SHOP */
-
-.shop{
-padding:40px;
-}
-
-.title{
-text-align:center;
-font-size:28px;
-margin-bottom:20px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-
-.product{
-background:white;
-border-radius:10px;
-overflow:hidden;
-box-shadow:0 5px 10px rgba(0,0,0,0.1);
-}
-
-.product img{
-width:100%;
-height:200px;
-object-fit:cover;
-}
-
-.info{
-padding:10px;
-}
-
-.price{
-color:var(--primary);
-font-weight:bold;
-}
-
-button{
-background:var(--primary);
-color:white;
-border:none;
-padding:8px 12px;
-cursor:pointer;
-border-radius:5px;
-}
-
-footer{
-text-align:center;
-padding:20px;
-background:white;
-margin-top:30px;
-}
-
-</style>
+        #vendorPage { display: none; padding: 40px 5%; }
+        .vendor-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+    </style>
 </head>
-
 <body>
 
-
-<nav>
-
-<div class="logo">ez<span>shop</span></div>
-
-<div class="right">
-
-<button class="login-btn" onclick="openLogin()" id="loginBtn">
-Login
-</button>
-
-<button class="login-btn" onclick="logout()" id="logoutBtn" style="display:none;background:red;">
-Logout
-</button>
-
-<div class="cart" onclick="openCart()">
-Cart : <span id="cart-count">0</span>
+<!-- GATEWAY -->
+<div id="gateway">
+    <div class="gate-box">
+        <h2 class="logo">Ez<span>shop</span></h2>
+        <p>Choose your portal</p>
+        <button class="gate-btn" style="background:var(--primary); color:white;" onclick="enterSite('customer')">Customer Portal</button>
+        <button class="gate-btn" style="background:#1e293b; color:white; border: 1px solid var(--primary);" onclick="enterSite('vendor')">Vendor Portal</button>
+    </div>
 </div>
 
+<!-- VENDOR INTERFACE -->
+<div id="vendorPage">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>Vendor Panel</h1>
+        <button class="cat-btn" onclick="location.reload()">Exit</button>
+    </div>
+    <div id="vendorOrders"></div>
 </div>
 
-</nav>
+<!-- CUSTOMER INTERFACE -->
+<div id="customerPage" style="display:none;">
+    <nav>
+        <div class="logo-container" onclick="location.reload()">
+            <div class="logo">Ez<span>shop</span></div>
+            <span class="subtitle">shopping made easy</span>
+        </div>
+        <div class="nav-actions">
+            <button class="cat-btn" style="background:var(--secondary); color:white; border:none" onclick="openModal('historyModal')">My Orders</button>
+            <div id="authArea"><button class="cat-btn" onclick="openModal('loginModal')">Login</button></div>
+            <div onclick="openCart()" style="cursor:pointer; position:relative;">
+                <i class="fa fa-shopping-cart" style="font-size: 1.4rem;"></i>
+                <span id="cartCount" style="position:absolute; top:-10px; right:-10px; background:var(--accent); color:white; font-size:10px; padding:2px 6px; border-radius:50%">0</span>
+            </div>
+        </div>
+    </nav>
 
+    <div class="categories">
+        <button class="cat-btn active sale" onclick="render('sale', this)">🔥 Flash Sale</button>
+        <button class="cat-btn" onclick="render('electronics', this)">Electronics</button>
+        <button class="cat-btn" onclick="render('merchandise', this)">Merchandise</button>
+        <button class="cat-btn" onclick="render('daily', this)">Daily Life</button>
+    </div>
 
-<!-- LOGIN -->
-
-<div class="popup" id="loginBox">
-
-<div class="popup-box">
-
-<h3 id="formTitle">Login</h3>
-
-<input type="text" id="username" placeholder="Username"><br>
-<input type="password" id="password" placeholder="Password"><br>
-
-<button onclick="login()">Submit</button>
-
-<p id="switchText">
-Don't have account?
-<span onclick="showSignup()" style="color:blue;cursor:pointer">
-Create Account
-</span>
-</p>
-
-<button class="close" onclick="closeLogin()">Close</button>
-
+    <section class="shop"><div class="grid" id="productGrid"></div></section>
 </div>
 
+<!-- MODALS -->
+<div class="modal" id="loginModal">
+    <div class="modal-box">
+        <h3>Login</h3>
+        <input type="text" id="custName" placeholder="Your Name" style="width:90%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+        <button class="gate-btn" style="background:var(--primary); color:white;" onclick="loginUser()">Login</button>
+        <p onclick="closeModal('loginModal')" style="text-align:center; color:red; cursor:pointer">Close</p>
+    </div>
 </div>
 
-
-
-<!-- CART POPUP -->
-
-<div class="popup" id="cartBox">
-
-<div class="popup-box">
-
-<h3>Your Cart</h3>
-
-<ul id="cartItems"></ul>
-
-<button onclick="clearCart()">Clear Cart</button>
-
-<br><br>
-
-<button class="close" onclick="closeCart()">Close</button>
-
+<div class="modal" id="cartModal">
+    <div class="modal-box">
+        <h3>Shopping Cart</h3>
+        <div id="cartItems"></div>
+        <h4 id="cartTotal" style="margin:20px 0; border-top:1px solid #eee; padding-top:10px;">Total: ₹0</h4>
+        <button class="gate-btn" style="background:var(--secondary); color:white;" onclick="checkLoginBeforeOrder()">Place Order</button>
+        <p onclick="closeModal('cartModal')" style="text-align:center; cursor:pointer">Close</p>
+    </div>
 </div>
 
+<div class="modal" id="historyModal">
+    <div class="modal-box">
+        <h3>Order Tracking</h3>
+        <div id="historyList"></div>
+        <button class="gate-btn" onclick="closeModal('historyModal')">Close</button>
+    </div>
 </div>
-
-
-
-<section class="hero">
-
-<h1>Shopping Made Easy</h1>
-<p>Buy gadgets and electronics</p>
-
-</section>
-
-
-
-<section class="shop">
-
-<h2 class="title">Trending Products</h2>
-
-<div class="grid">
-
-
-<div class="product">
-<img src="https://m.media-amazon.com/images/I/712wyKsNmML.jpg">
-<div class="info">
-<h3>Headphone</h3>
-<p class="price">₹1299</p>
-<button onclick="addToCart('Headphone')">Add to Cart</button>
-</div>
-</div>
-
-
-<div class="product">
-<img src="https://imgcdn.stablediffusionweb.com/2024/10/15/2eac7182-4bef-47c2-9ea3-2d282aa1d85f.jpg">
-<div class="info">
-<h3>Smartphone</h3>
-<p class="price">₹39999</p>
-<button onclick="addToCart('Smartphone')">Add to Cart</button>
-</div>
-</div>
-
-
-<div class="product">
-<img src="https://tse4.mm.bing.net/th/id/OIP.SZwgX2tpRJuo5MnMQ6rr8wHaDv?pid=Api">
-<div class="info">
-<h3>Keyboard</h3>
-<p class="price">₹12000</p>
-<button onclick="addToCart('Keyboard')">Add to Cart</button>
-</div>
-</div>
-
-
-<div class="product">
-<img src="https://tse3.mm.bing.net/th/id/OIP.7bsTJYW9vlGrfrWW37VhEwHaE6?pid=Api">
-<div class="info">
-<h3>Laptop</h3>
-<p class="price">₹49999</p>
-<button onclick="addToCart('Laptop')">Add to Cart</button>
-</div>
-</div>
-
-
-</div>
-
-</section>
-
-
-<footer>
-© 2026 ezshop
-</footer>
-
-
 
 <script>
-
-let cart = [];
-let mode="login";
-
-
-function addToCart(item){
-
-cart.push(item);
-
-document.getElementById("cart-count").innerText=cart.length;
-
-}
-
-
-function openCart(){
-
-let list=document.getElementById("cartItems");
-
-list.innerHTML="";
-
-cart.forEach(function(i){
-
-let li=document.createElement("li");
-
-li.innerText=i;
-
-list.appendChild(li);
-
-});
-
-document.getElementById("cartBox").style.display="flex";
-
-}
-
-
-function closeCart(){
-
-document.getElementById("cartBox").style.display="none";
-
-}
-
-
-function clearCart(){
-
-cart=[];
-
-document.getElementById("cart-count").innerText=0;
-
-document.getElementById("cartItems").innerHTML="";
-
-}
-
-
-
-function openLogin(){
-document.getElementById("loginBox").style.display="flex";
-}
-
-function closeLogin(){
-document.getElementById("loginBox").style.display="none";
-}
-
-
-function showSignup(){
-
-mode="signup";
-
-document.getElementById("formTitle").innerText="Create Account";
-
-document.getElementById("switchText").innerHTML=
-'Already have account? <span onclick="showLogin()">Login</span>';
-
-}
-
-
-function showLogin(){
-
-mode="login";
-
-document.getElementById("formTitle").innerText="Login";
-
-document.getElementById("switchText").innerHTML=
-'Don\'t have account? <span onclick="showSignup()">Create</span>';
-
-}
-
-
-function login(){
-
-let user=username.value;
-let pass=password.value;
-
-if(mode=="signup"){
-
-localStorage.setItem("user",user);
-localStorage.setItem("pass",pass);
-
-alert("Account created");
-
-showLogin();
-
-return;
-
-}
-
-if(user==localStorage.getItem("user")
-&& pass==localStorage.getItem("pass")){
-
-alert("Login success");
-
-loginBtn.style.display="none";
-logoutBtn.style.display="inline";
-
-closeLogin();
-
-}else{
-
-alert("Wrong login");
-
-}
-
-}
-
-
-function logout(){
-
-loginBtn.style.display="inline";
-logoutBtn.style.display="none";
-
-}
-
-
+    // Organized Product Catalog
+    const products = [
+        // FLASH SALE
+        { id: 's1', name: 'Ultra-Bass Wireless Headphones', price: 1299, old: 3999, cat: 'sale', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400' },
+        { id: 's2', name: 'Smart Fitness Tracker v4', price: 899, old: 2499, cat: 'sale', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400' },
+        { id: 's3', name: 'Mechanical RGB Keyboard', price: 1599, old: 4500, cat: 'sale', img: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=400' },
+        { id: 's4', name: 'Fast Charging Powerbank', price: 699, old: 1800, cat: 'sale', img: 'https://static.vecteezy.com/system/resources/previews/050/631/621/non_2x/power-bank-isolated-on-white-background-free-photo.jpg' },
+
+        // ELECTRONICS
+        { id: 'e1', name: '4K Mirrorless Camera', price: 45000, cat: 'electronics', img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400' },
+        { id: 'e2', name: 'Noise Cancelling Earbuds', price: 2500, cat: 'electronics', img: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400' },
+        { id: 'e3', name: 'Portable 1TB SSD', price: 6500, cat: 'electronics', img: 'https://byline.network/wp-content/uploads/2021/03/%EC%82%AC%EC%A7%84%EC%9E%90%EB%A3%8C%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90-NVMe-SSD-980-%EC%B6%9C%EC%8B%9C_2-scaled.jpg' },
+        { id: 'e4', name: 'Curved Gaming Monitor', price: 18500, cat: 'electronics', img: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400' },
+        { id: 'e5', name: 'RGB Mouse', price: 450, cat: 'electronics', img: 'https://img.freepik.com/premium-photo/rgb-colorful-mouse_823919-2518.jpg' },
+        { id: 'e6', name: 'Backlit Keyboard', price: 750, cat: 'electronics', img: 'https://m.media-amazon.com/images/S/aplus-media-library-service-media/e9a53bb4-395e-4c67-98a3-1ab3ce486d48.__CR0,0,970,600_PT0_SX970_V1___.jpg' },
+        { id: 'e7', name: 'iPhone 15', price: 45000, cat: 'electronics', img: 'https://m.media-amazon.com/images/I/81UKVHM77GL._AC_SL1500_.jpg' },
+        { id: 'e8', name: '60 Watt Adapter', price: 400, cat: 'electronics', img: 'https://tse4.mm.bing.net/th/id/OIP.lzjkea1FCINaX3Hguz9Q6gHaHa?pid=Api&P=0&h=180' },
+        { id: 'e9', name: 'C- type Cable', price: 100, cat: 'electronics', img: 'https://m.media-amazon.com/images/I/71EgDyQRLAL._AC_.jpg' },
+        { id: 'e10', name: 'Cooling Pad', price: 650, cat: 'electronics', img: 'https://m.media-amazon.com/images/I/71kshfDNosL._AC_SL1500_.jpg' },
+        
+        // MERCHANDISE
+        { id: 'm1', name: 'Minimalist Cotton Hoodie', price: 1200, cat: 'merchandise', img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400' },
+        { id: 'm2', name: 'Graphic Print Tee', price: 599, cat: 'merchandise', img: 'https://slimages.macysassets.com/is/image/MCY/products/2/optimized/27548812_fpx.tif?op_sharpen=1&wid=700&hei=855&fit=fit,1' },
+        { id: 'm3', name: 'Canvas Tote Bag', price: 350, cat: 'merchandise', img: 'https://cdn.shopify.com/s/files/1/0404/2041/products/QTEES_CANVAS_STANDARD_TOTE_BAG_Q1400_1024x1024.jpeg?v=1439594825' },
+        { id: 'm4', name: 'Black Tshirt', price: 450, cat: 'merchandise', img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=500' },
+        { id: 'm5', name: 'White Pajama', price: 450, cat: 'merchandise', img: 'https://cdna.lystit.com/photos/theoutnet/032c3d0e/bodas-White-Cotton-twill-Pajama-Pants.jpeg' },
+        { id: 'm6', name: 'Black Sando', price: 450, cat: 'merchandise', img: 'https://5.imimg.com/data5/ANDROID/Default/2022/7/OS/FA/QF/145964626/product-jpeg-1000x1000.jpg' },
+        { id: 'm7', name: 'Grey Compression', price: 450, cat: 'merchandise', img: 'https://joggersports.com/wp-content/uploads/2024/11/Dark-Grey-Compression.webp' },
+        { id: 'm8', name: 'White Hat', price: 450, cat: 'merchandise', img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=500' },
+        { id: 'm9', name: 'Embroidered Dad Hat', price: 450, cat: 'merchandise', img: 'https://i.etsystatic.com/27083485/r/il/f06e2b/4396082920/il_1080xN.4396082920_enkp.jpg' },
+        { id: 'm10', name: 'Bootcut jeans', price: 450, cat: 'merchandise', img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500' },
+        
+        
+
+        // DAILY LIFE
+        { id: 'd1', name: 'Insulated Coffee Tumbler', price: 450, cat: 'daily', img: 'https://m.media-amazon.com/images/I/710LU9HGRCL._AC_SL1500_.jpg' },
+        { id: 'd2', name: 'Ceramic Succulent Pot', price: 199, cat: 'daily', img: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400' },
+        { id: 'd3', name: 'Leather Pocket Planner', price: 299, cat: 'daily', img: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=400' },
+        { id: 'd4', name: 'Organic Scented Candle', price: 349, cat: 'daily', img: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?w=400' },
+        { id: 'd5', name: 'Ac cover', price: 450, cat: 'daily', img: 'https://m.media-amazon.com/images/I/61pTKwiCNCL._AC_SL1500_.jpg' },
+        { id: 'd6', name: 'Side table', price: 450, cat: 'daily', img: 'https://assets.wfcdn.com/im/13267150/compr-r85/2448/244871691/Casiah+Round+Living+Room+Side+Table.jpg' },
+        { id: 'd7', name: 'Refrigerator Cover', price: 450, cat: 'daily', img: 'https://4.imimg.com/data4/TG/YW/MY-17737792/refrigerator-fridge-top-cover.jpg' },
+        { id: 'd8', name: 'Water bottle', price: 450, cat: 'daily', img: 'https://tse1.mm.bing.net/th/id/OIP.rgSLsXMUOa6_i3DSCkF3GQHaE8?pid=Api&P=0&h=180' },
+        { id: 'd9', name: 'Plastic Containers', price: 450, cat: 'daily', img: 'https://i5.walmartimages.com/seo/Mainstays-5-23Cup-Plastic-Rectangle-Food-Storage-Container_0f4d1c4e-5b59-4652-8546-b10a7dddb6eb.2fd94d1f362b4090fa72ef53127c5392.jpeg' },
+        { id: 'd10', name: 'Painting', price: 450, cat: 'daily', img: 'https://static.vecteezy.com/system/resources/previews/021/979/809/large_2x/radha-krishna-in-love-painting-wall-art-8k-generative-ai-radha-krishna-paintings-on-canvas-photo.jpg' },
+    ];
+
+    let cart = [];
+    let orders = JSON.parse(localStorage.getItem('ezOrders')) || [];
+
+    function enterSite(role) {
+        document.getElementById('gateway').style.display = 'none';
+        if(role === 'customer') {
+            document.getElementById('customerPage').style.display = 'block';
+            render('sale');
+        } else {
+            document.getElementById('vendorPage').style.display = 'block';
+            renderVendor();
+        }
+    }
+
+    function render(cat, btn) {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = "";
+        
+        if(btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        const filtered = products.filter(p => p.cat === cat);
+        filtered.forEach(p => {
+            grid.innerHTML += `
+                <div class="product-card">
+                    ${p.old ? `<div class="sale-badge">SALE</div>` : ''}
+                    <img src="${p.img}">
+                    <div style="padding:15px">
+                        <h4 style="margin:0 0 10px 0; font-size:14px; height: 35px; overflow: hidden;">${p.name}</h4>
+                        <b style="color:var(--primary)">₹${p.price}</b> 
+                        ${p.old ? `<span style="text-decoration:line-through; font-size:12px; color:#999">₹${p.old}</span>` : ''}
+                        <button class="gate-btn" style="background:var(--primary); color:white; font-size:12px; padding:8px" onclick="addToCart('${p.id}')">Add to Cart</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function addToCart(id) {
+        const p = products.find(x => x.id === id);
+        cart.push(p);
+        document.getElementById('cartCount').innerText = cart.length;
+    }
+
+    function openCart() {
+        const list = document.getElementById('cartItems');
+        let total = 0; list.innerHTML = "";
+        cart.forEach(item => {
+            total += item.price;
+            list.innerHTML += `<div class="order-item"><img src="${item.img}"><div><b>${item.name}</b><br>₹${item.price}</div></div>`;
+        });
+        document.getElementById('cartTotal').innerText = "Total: ₹" + total;
+        openModal('cartModal');
+    }
+
+    function checkLoginBeforeOrder() {
+        if(cart.length === 0) return alert("Cart empty!");
+        if(!localStorage.getItem('ezUser')) {
+            closeModal('cartModal');
+            openModal('loginModal');
+        } else {
+            placeOrder();
+        }
+    }
+
+    function placeOrder() {
+        const newOrder = {
+            orderId: Date.now(),
+            customer: localStorage.getItem('ezUser'),
+            items: [...cart],
+            total: cart.reduce((s, i) => s + i.price, 0),
+            status: "Pending Approval",
+            eta: "Calculating..."
+        };
+        orders.push(newOrder);
+        localStorage.setItem('ezOrders', JSON.stringify(orders));
+        cart = []; document.getElementById('cartCount').innerText = 0;
+        alert("Order Received!"); closeModal('cartModal');
+    }
+
+    function renderVendor() {
+        const list = document.getElementById('vendorOrders');
+        list.innerHTML = orders.length === 0 ? "<h3>No orders.</h3>" : "";
+        orders.forEach((o, idx) => {
+            let itemsHtml = o.items.map(i => `<div class="order-item"><img src="${i.img}"><span>${i.name} (₹${i.price})</span></div>`).join('');
+            list.innerHTML += `
+                <div class="vendor-card">
+                    <h4>Order #${o.orderId} - By: ${o.customer}</h4>
+                    <div>${itemsHtml}</div>
+                    <p>Total: <b>₹${o.total}</b> | Current: <b>${o.status}</b></p>
+                    <select id="stat-${idx}" style="padding:10px; border-radius:8px">
+                        <option value="Packaged">Packaged</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                    <button class="cat-btn active" onclick="updateStatus(${idx})">Update Status</button>
+                </div>`;
+        });
+    }
+
+    function updateStatus(idx) {
+        const s = document.getElementById(`stat-${idx}`).value;
+        orders[idx].status = s;
+        localStorage.setItem('ezOrders', JSON.stringify(orders));
+        renderVendor();
+    }
+
+    function openModal(id) {
+        if(id === 'historyModal') {
+            const list = document.getElementById('historyList');
+            const user = localStorage.getItem('ezUser');
+            const myOrders = orders.filter(o => o.customer === user);
+            list.innerHTML = myOrders.length === 0 ? "<p>No orders yet.</p>" : "";
+            myOrders.forEach(o => {
+                let statusClass = o.status.toLowerCase().replace(/ /g, '-');
+                list.innerHTML += `
+                    <div style="border-bottom:1px solid #eee; padding:15px 0">
+                        <b>Order #${o.orderId}</b><br>
+                        <span class="status-pill st-${statusClass}">${o.status}</span>
+                        <div style="margin-top:10px">${o.items.map(i => `<img src="${i.img}" style="width:40px; margin-right:5px; border-radius:4px">`).join('')}</div>
+                    </div>`;
+            });
+        }
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function loginUser() {
+        const n = document.getElementById('custName').value;
+        if(!n) return;
+        localStorage.setItem('ezUser', n);
+        document.getElementById('authArea').innerHTML = `<b>Hi, ${n}</b>`;
+        closeModal('loginModal');
+    }
 </script>
-
 </body>
 </html>
